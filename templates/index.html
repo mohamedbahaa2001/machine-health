@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Machine Data Input</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+        
+        body::before {
+            content: "";
+            background-image: url("{{ url_for('static', filename='img.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+            /* Adjust the opacity as desired */
+            filter: brightness(70%);
+            /* Adjust the brightness as desired */
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Enter Machine Data</h1>
+    <form id="dataForm" action="/" method="POST">
+        <label for="type">Type:</label>
+        <input type="text" id="type" name="type"><br><br>
+
+        <label for="airTemp">Air Temperature (K):</label>
+        <input type="text" id="airTemp" name="airTemp"><br><br>
+
+        <label for="processTemp">Process Temperature (K):</label>
+        <input type="text" id="processTemp" name="processTemp"><br><br>
+
+        <label for="rotationalSpeed">Rotational Speed (RPM):</label>
+        <input type="text" id="rotationalSpeed" name="rotationalSpeed"><br><br>
+
+        <label for="torque">Torque (Nm):</label>
+        <input type="text" id="torque" name="torque"><br><br>
+
+        <label for="toolWear">Tool Wear (min):</label>
+        <input type="text" id="toolWear" name="toolWear"><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+    <!-- Add this inside the <form> element -->
+    <label for="csvFile">Upload CSV File:</label>
+    <input type="file" id="csvFile" name="csvFile" accept=".csv"><br><br>
+
+    <div id="predictionResult">
+        {% if prediction is defined %} Prediction: {{ prediction[0] }} {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#csvFile').change(function() {
+                var file = this.files[0];
+                var formData = new FormData();
+                formData.append('csvFile', file);
+
+                // Send the POST request to the Flask backend
+                fetch('/upload_csv', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        // Display the prediction results in a table
+                        var table = '<table><tr><th>Index</th><th>Prediction</th></tr>';
+                        data.predictions.forEach(function(prediction, index) {
+                            table += '<tr><td>' + (index + 1) + '</td><td>' + prediction + '</td></tr>';
+                        });
+                        table += '</table>';
+                        document.getElementById('predictionResult').innerHTML = table;
+                    })
+                    .catch(function(error) {
+                        console.error('Error:', error);
+                    });
+            });
+            $('#dataForm').submit(function(event) {
+                event.preventDefault();
+
+                // Collect form data
+                var formData = {
+                    'Type': $('#type').val(),
+                    'Air temperature [K]': parseFloat($('#airTemp').val()),
+                    'Process temperature [K]': parseFloat($('#processTemp').val()),
+                    'Rotational speed [rpm]': parseFloat($('#rotationalSpeed').val()),
+                    'Torque [Nm]': parseFloat($('#torque').val()),
+                    'Tool wear [min]': parseFloat($('#toolWear').val())
+                };
+
+                // Send the POST request to the Flask backend
+                fetch('/predict', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    })
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        // Display the prediction result
+                        var predictionResult = document.getElementById('predictionResult');
+                        predictionResult.innerHTML = 'Prediction: ' + data.prediction;
+                    })
+                    .catch(function(error) {
+                        console.error('Error:', error);
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>

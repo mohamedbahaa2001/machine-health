@@ -1,0 +1,69 @@
+/* CSS for Machine Data Input */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    width: 400px;
+    margin: 0 auto;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="file"] {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 20cm;
+}
+
+input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    border-radius: 20cm;
+    cursor: pointer;
+}
+
+#predictionResult {
+    margin-top: 20px;
+    background-color: transparent;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: #fff;
+    /* Set the desired background color for the table */
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    background-color: #fff;
+    /* Set the desired background color for the table cells */
+}
+
+
+/* Media Query for small screens */
+
+@media screen and (max-width: 600px) {
+    form {
+        width: 100%;
+    }
+}
